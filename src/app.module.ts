@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
-import { PrismaService } from './prisma.service';
+import { MongooseModule } from '@nestjs/mongoose';
+
 
 @Module({
-  imports: [UsersModule],
-  controllers: [AppController],
-  providers: [PrismaService],
+  imports: [MongooseModule.forRoot('mongodb+srv://gideonfame94:GidsDev%4003122004@cluster0.jywljhv.mongodb.net/'), UsersModule],
+
+  
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
+

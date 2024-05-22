@@ -1,18 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { PrismaService } from 'src/prisma.service';
-import { Prisma } from '@prisma/client';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './entities/user.entity';
 
 @Module({
+  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
   controllers: [UsersController],
-  providers: [UsersService, PrismaService],
+  providers: [UsersService],
 })
-export class UsersModule implements Prisma.UserCreateInput{
-  id: string;
-  firstName: string;
-  lastLame: string;
-  username: string;
-  password: string;
-  
-}
+export class UsersModule {}

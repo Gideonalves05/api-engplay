@@ -1,55 +1,44 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from './entities/user.entity';
-import { PrismaService } from 'src/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './entities/user.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersService {
 
-    constructor(private prisma: PrismaService){}
+constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
 
-    private users: User[] = [
-        {
-          id: 1,
-          firstName: 'Gideon',
-          lastName: 'Ipiranga',
-          username: 'GideonAlves',
-          email: 'gideon@example.com',
-          password: 'acb@123'
-        },
-    ];
+  create(createUserDto: CreateUserDto) {
+    const user = new this.UserModel(createUserDto);
+    return user.save();
+  }
 
-    findAll() {
-        return this.users;
-    }
+  findAll() {
+    return this.UserModel.find();
+  }
 
-    findOne(id: number) {
-        const user = this.users.find(user => user.id === id);
-        if (!user) {
-            throw new NotFoundException(`User ID ${id} not found`);
-        }
-        return user;
-    }
+findOne(id: number) {
+    return this.UserModel.findById(id);
+  }
 
-    create(createUserDTO: any) {
-        this.users.push(createUserDTO);
-        return createUserDTO;
-    }
+  update(id: number, updateUserDto: UpdateUserDto) {
+    return this.UserModel.findByIdAndUpdate({
+        _id: id,
+    },{
+    $Set:  updateUserDto,
+        
+    },{
+        new: true,
+    },
+  );
+  }
 
-    update(id: number, updateUserDTO: any) {
-        const existingUser = this.findOne(id);
-        if (existingUser) {
-            const index = this.users.findIndex(user => user.id === id);
-            this.users[index] = {
-                id,
-                ...updateUserDTO,
-            };
-        }
-    }
-
-    remove(id: number) {
-        const index = this.users.findIndex(user => user.id === id);
-        if (index >= 0) {
-            this.users.splice(index, 1);
-        }
-    }
+  remove(id: number) {
+    return this.UserModel.deleteOne({
+      _id: id,
+    })
+    .exec();
+  }
 }
